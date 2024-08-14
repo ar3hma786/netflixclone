@@ -1,6 +1,8 @@
 package com.netflix.netflixclone.service;
 
 import org.springframework.beans.factory.annotation.Autowired;
+
+
 import org.springframework.stereotype.Service;
 
 import com.netflix.netflixclone.dto.EpisodesRequest;
@@ -8,9 +10,9 @@ import com.netflix.netflixclone.entities.Episodes;
 import com.netflix.netflixclone.entities.Seasons;
 import com.netflix.netflixclone.entities.TVShows;
 import com.netflix.netflixclone.exception.EpisodesException;
+import com.netflix.netflixclone.exception.SeasonsException;
+import com.netflix.netflixclone.exception.TVShowsException;
 import com.netflix.netflixclone.repository.EpisodesRepository;
-import com.netflix.netflixclone.repository.SeasonsRepository;
-import com.netflix.netflixclone.repository.TVShowsRepository;
 
 import java.util.List;
 import java.util.Optional;
@@ -22,16 +24,33 @@ public class EpisodesServiceImpl implements EpisodesService {
     private EpisodesRepository episodesRepository;
 
     @Autowired
-    private SeasonsRepository seasonsRepository;
+    private SeasonsService seasonsService;
 
     @Autowired
-    private TVShowsRepository tvShowsRepository;
+    private TVShowsService tvShowsService;
 
     @Override
-    public Episodes createEpisode(EpisodesRequest request) throws EpisodesException {
-        
+    public Episodes addEpisode(EpisodesRequest request) throws EpisodesException, SeasonsException, TVShowsException  {
+    	TVShows findTVShows = tvShowsService.findById(request.getTvShowId());
+    	
+    	if (findTVShows == null) {
+            throw new TVShowsException("TV show not found with Id" +request.getTvShowId());
+        }
+    	
+    	Seasons findSeason = seasonsService.findSeasonById(request.getSeasonId());
+    	
+    	if (findSeason == null) {
+            throw new SeasonsException("Season not found with Id" + request.getSeasonId());
+        }
+    	
+    	Episodes episodes = new Episodes();
+    	episodes.setEpisodeName(request.getEpisodeName());
+    	episodes.setDescription(request.getDescription());
+    	episodes.setReleaseDate(request.getReleaseDate());
+    	episodes.setDurationMinutes(request.getDurationMinutes());
+        episodes.setSeason(findSeason);
 
-        return episodesRepository.save();
+        return episodesRepository.save(episodes);
     }
 
     @Override
@@ -41,34 +60,28 @@ public class EpisodesServiceImpl implements EpisodesService {
     }
 
     @Override
-    public Episodes updateEpisode(Long episodeId, EpisodesRequest request) throws EpisodesException {
-        if (request == null || episodeId == null) {
-            throw new EpisodesException("Invalid episode request");
+    public Episodes updateEpisode(Long episodeId, Episodes episodes) throws EpisodesException, SeasonsException, TVShowsException {
+    	Seasons findSeason = seasonsService.findSeasonById(episodes.getSeason().getSeasonId());
+    	
+    	if (findSeason == null) {
+            throw new SeasonsException("Season not found with Id" + episodes.getSeason().getSeasonId());
         }
-
-        Episodes existingEpisode = findEpisodeById(episodeId);
-        existingEpisode.setEpisodeName(request.getEpisodeName());
-        existingEpisode.setDescription(request.getDescription());
-        existingEpisode.setReleaseDate(request.getReleaseDate());
-        existingEpisode.setDurationMinutes(request.getDurationMinutes());
-
-        // Optionally, you could update the season if it changes
-        if (request.getSeasonId() != null) {
-            Optional<Seasons> seasonOptional = seasonsRepository.findById(request.getSeasonId());
-            if (seasonOptional.isPresent()) {
-                Seasons season = seasonOptional.get();
-                existingEpisode.setSeason(season);
-
-                // Fetch the TV Show by ID and associate it with the season
-                Optional<TVShows> tvShowOptional = tvShowsRepository.findById(season.getTvShowId());
-                if (tvShowOptional.isPresent()) {
-                    TVShows tvShow = tvShowOptional.get();
-                    existingEpisode.setTvShow(tvShow);
-                }
-            }
+    	
+    	Optional<Episodes> existingEpisode = episodesRepository.findById(episodeId);
+    	
+    	if (!existingEpisode.isPresent()) {
+            throw new EpisodesException("Eppisode not found with id" +episodeId);
         }
-
-        return episodesRepository.save(existingEpisode);
+    	
+    	Episodes existEpisodes = existingEpisode.get();
+    	
+    	existEpisodes.setEpisodeName(episodes.getEpisodeName());
+    	existEpisodes.setDescription(episodes.getDescription());
+    	existEpisodes.setReleaseDate(episodes.getReleaseDate());
+    	existEpisodes.setDurationMinutes(episodes.getDurationMinutes());											
+    	existEpisodes.setSeason(findSeason);
+    	return episodesRepository.save(episodes);
+        
     }
 
     @Override

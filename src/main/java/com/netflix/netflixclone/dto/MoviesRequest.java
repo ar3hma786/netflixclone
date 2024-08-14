@@ -17,7 +17,7 @@ public class MoviesRequest {
     
     private String image;
     
-    private String description;
+    private String description; 
     
     private LocalDate releaseDate;
     

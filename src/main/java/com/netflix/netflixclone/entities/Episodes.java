@@ -7,6 +7,7 @@ import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
+import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.Table;
 import lombok.AllArgsConstructor;
@@ -28,6 +29,7 @@ public class Episodes {
     private String episodeName;
     
     @ManyToOne
+    @JoinColumn(name = "season_id")
     private Seasons season;
     
     @Column(name = "DESCRIPTION", length = 1000)
@@ -38,4 +40,7 @@ public class Episodes {
     
     @Column(name = "DURATION_MINUTES")
     private int durationMinutes;
+    
+    @Column(name = "TV_SHOW_ID")
+    private Long tvShowId;
 }

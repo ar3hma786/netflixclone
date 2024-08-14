@@ -46,19 +46,19 @@ public class TVShowsServiceImpl implements TVShowsService {
     }
 
     @Override
-    public TVShows updateRequest(TVShowsRequest request, Long tvshowsId) throws TVShowsException {
+    public TVShows updateTVShows(TVShows tvShows, Long tvshowsId) throws TVShowsException {
         Optional<TVShows> existingTVShow = tvShowsRepository.findById(tvshowsId);
         if (!existingTVShow.isPresent()) {
             throw new TVShowsException("TV show with ID '" + tvshowsId + "' not found");
         }
         
         TVShows tvShowsToUpdate = existingTVShow.get();
-        tvShowsToUpdate.setTvshowName(request.getTvshowName());
-        tvShowsToUpdate.setImage(request.getImage());
-        tvShowsToUpdate.setDescription(request.getDescription());
-        tvShowsToUpdate.setReleaseDate(request.getReleaseDate());
-        tvShowsToUpdate.setGenre(request.getGenre());
-        tvShowsToUpdate.setSeasons(request.getSeasons());
+        tvShowsToUpdate.setTvshowName(tvShows.getTvshowName());
+        tvShowsToUpdate.setImage(tvShows.getImage());
+        tvShowsToUpdate.setDescription(tvShows.getDescription());
+        tvShowsToUpdate.setReleaseDate(tvShows.getReleaseDate());
+        tvShowsToUpdate.setGenre(tvShows.getGenre());
+        tvShowsToUpdate.setSeasons(tvShows.getSeasons());
         
         return tvShowsRepository.save(tvShowsToUpdate);
     }

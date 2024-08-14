@@ -46,20 +46,24 @@ public class MoviesServiceImpl implements MoviesService {
     }
 
     @Override
-    public Movies updateRequest(MoviesRequest request, Long movieId) throws MoviesException {
-        if (request == null || movieId == null) {
-            throw new MoviesException("Invalid movie request");
+    public Movies updateMovies(Movies movies, Long movieId) throws MoviesException {
+        Optional<Movies> existingMovieOpt = moviesRepository.findById(movieId);
+
+        // Check if the movie exists
+        if (!existingMovieOpt.isPresent()) {
+            throw new MoviesException("Movie not found with id " + movieId);
         }
 
-        Movies existingMovie = findById(movieId);
-        existingMovie.setMovieName(request.getMovieName());
-        existingMovie.setGenre(request.getGenre());
-        existingMovie.setDescription(request.getDescription());
-        existingMovie.setReleaseDate(request.getReleaseDate());
-        existingMovie.setImage(request.getImage());
-        
+        Movies existingMovie = existingMovieOpt.get();
+
+        existingMovie.setMovieName(movies.getMovieName());
+        existingMovie.setImage(movies.getImage());
+        existingMovie.setDescription(movies.getDescription());
+        existingMovie.setReleaseDate(movies.getReleaseDate());
+        existingMovie.setGenre(movies.getGenre());
         return moviesRepository.save(existingMovie);
     }
+
 
     @Override
     public void deleteById(Long movieId) throws MoviesException {

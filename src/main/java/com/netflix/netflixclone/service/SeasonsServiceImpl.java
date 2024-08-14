@@ -26,7 +26,7 @@ public class SeasonsServiceImpl implements SeasonsService {
 	public Seasons registerSeason(SeasonsRequest request) throws SeasonsException, TVShowsException {
 		TVShows findTVShows = tvShowsService.findById(request.getTvShowId());
         if (findTVShows == null) {
-            throw new TVShowsException("TV show not found");
+            throw new TVShowsException("TV show not found with Id" + request.getTvShowId());
         }
         
         Seasons newSeason = new Seasons();
@@ -37,25 +37,25 @@ public class SeasonsServiceImpl implements SeasonsService {
         return seasonsRepository.save(newSeason);
 	}
 
-//	@Override
-//	public Seasons updateSeason(Seasons, Long seasonsId) throws SeasonsException, TVShowsException {
-//		TVShows findTVShows = tvShowsService.findById(request.getTvShowId());
-//        if (findTVShows == null) {
-//            throw new TVShowsException("TV show not found");
-//        }
-//		
-//		Optional<Seasons> seasonOptional = seasonsRepository.findById(seasonsId);
-//        if (!seasonOptional.isPresent()) {
-//            throw new SeasonsException("Season not found");
-//        }
-//        
-//        Seasons season = seasonOptional.get();
-//        season.setSeasonName(request.getSeasonName());
-//        season.setEpisodes(request.getEpisodes());
-//        season.setTvShow(findTVShows);
-//        
-//        return seasonsRepository.save(season);
-//	}
+	@Override
+	public Seasons updateSeason(Seasons seasons, Long seasonsId) throws SeasonsException, TVShowsException {
+		TVShows findTVShows = tvShowsService.findById(seasons.getTvShow().getTvshowId());
+        if (findTVShows == null) {
+            throw new TVShowsException("TV show not found with Id" + seasons.getTvShow().getTvshowId());
+        }
+		
+		Optional<Seasons> seasonOptional = seasonsRepository.findById(seasonsId);
+        if (!seasonOptional.isPresent()) {
+            throw new SeasonsException("Season not found with" +seasonsId);
+        }
+        
+        Seasons season = seasonOptional.get();
+        season.setSeasonName(seasons.getSeasonName());
+        season.setEpisodes(seasons.getEpisodes());
+        season.setTvShow(findTVShows);
+        
+        return seasonsRepository.save(season);
+	}
 
 	@Override
 	public Seasons findSeasonById(Long seasonId) throws SeasonsException {

@@ -2,6 +2,7 @@ package com.netflix.netflixclone.controller;
 
 import java.util.List;
 
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -12,22 +13,20 @@ import com.netflix.netflixclone.entities.User;
 import com.netflix.netflixclone.exception.EpisodesException;
 import com.netflix.netflixclone.exception.UserException;
 import com.netflix.netflixclone.service.EpisodesService;
-import com.netflix.netflixclone.service.SeasonsService;
 import com.netflix.netflixclone.service.UserService;
 
 @RestController
 @RequestMapping("/api/episodes")
 public class EpisodesController {
 
-    private final UserService userService;
-    private final SeasonsService seasonsService;
-    private final EpisodesService episodesService;
+	
+    @Autowired
+    private UserService userService;
+    
+    @Autowired
+    private EpisodesService episodesService;
 
-    public EpisodesController(UserService userService, SeasonsService seasonsService, EpisodesService episodesService) {
-        this.userService = userService;
-        this.seasonsService = seasonsService;
-        this.episodesService = episodesService;
-    }
+   
 
     @PostMapping("/")
     public ResponseEntity<?> registerEpisode(@RequestBody EpisodesRequest request, @RequestHeader("Authorization") String jwt) throws EpisodesException {
@@ -36,7 +35,7 @@ public class EpisodesController {
             if (user == null) {
                 return new ResponseEntity<>("User not authorized", HttpStatus.UNAUTHORIZED);
             }
-            Episodes episode = episodesService.registerEpisode(request);
+            Episodes episode = episodesService.addEpisode(request);
             return new ResponseEntity<>(episode, HttpStatus.CREATED);
         } catch (EpisodesException e) {
             return new ResponseEntity<>(e.getMessage(), HttpStatus.BAD_REQUEST);
@@ -60,13 +59,13 @@ public class EpisodesController {
     }
 
     @PutMapping("/{episodeId}")
-    public ResponseEntity<?> updateEpisode(@PathVariable Long episodeId, @RequestBody EpisodesRequest request, @RequestHeader("Authorization") String jwt) throws EpisodesException {
+    public ResponseEntity<?> updateEpisode(@PathVariable Long episodeId, @RequestBody Episodes episodes, @RequestHeader("Authorization") String jwt) throws EpisodesException {
         try {
             User user = userService.findUserProfileByJwt(jwt);
             if (user == null) {
                 return new ResponseEntity<>("User not authorized", HttpStatus.UNAUTHORIZED);
             }
-            Episodes updatedEpisode = episodesService.updateEpisode(episodeId, request);
+            Episodes updatedEpisode = episodesService.updateEpisode(episodeId, episodes);
             return new ResponseEntity<>(updatedEpisode, HttpStatus.OK);
         } catch (EpisodesException e) {
             return new ResponseEntity<>(e.getMessage(), HttpStatus.BAD_REQUEST);

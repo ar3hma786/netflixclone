@@ -42,13 +42,13 @@ public class TVShowsController {
     }
 	
 	@PutMapping("/{tvshowsId}")
-    public ResponseEntity<?> updateRequest(@RequestBody TVShowsRequest request, @PathVariable Long tvshowsId, @RequestHeader("Authorization") String jwt) {
+    public ResponseEntity<?> updateTVShows(@RequestBody TVShows tvShows, @PathVariable Long tvshowsId, @RequestHeader("Authorization") String jwt) {
         try {
             User user = userService.findUserProfileByJwt(jwt);
             if (user == null) {
                 return new ResponseEntity<>("User not authorized", HttpStatus.UNAUTHORIZED);
             }
-            TVShows updatedTVShow = tvShowsService.updateRequest(request, tvshowsId);
+            TVShows updatedTVShow = tvShowsService.updateTVShows(tvShows, tvshowsId);
             return new ResponseEntity<>(updatedTVShow, HttpStatus.OK);
         } catch (TVShowsException e) {
             return new ResponseEntity<>(e.getMessage(), HttpStatus.BAD_REQUEST);

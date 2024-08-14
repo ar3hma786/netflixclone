@@ -11,7 +11,7 @@ public interface TVShowsService {
   
 	public TVShows registerRequest(TVShowsRequest request) throws TVShowsException;
 	
-	public TVShows updateRequest(TVShowsRequest request, Long tvshowsId) throws  TVShowsException;
+	public TVShows updateTVShows(TVShows request, Long tvshowsId) throws  TVShowsException;
 	
 	public TVShows findById(Long tvshowId) throws TVShowsException;
 	

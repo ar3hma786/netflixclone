@@ -12,7 +12,7 @@ public interface MoviesService {
 	
     public Movies findById(Long movieId) throws MoviesException;
     
-    public Movies updateRequest(MoviesRequest request, Long movieId) throws MoviesException;
+    public Movies updateMovies(Movies movies, Long movieId) throws MoviesException;
     
     public void deleteById(Long movieId) throws MoviesException;
     

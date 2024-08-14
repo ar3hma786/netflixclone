@@ -59,7 +59,7 @@ public class MoviesController {
     }
 
     @PutMapping("/{movieId}")
-    public ResponseEntity<?> updateRequest(@RequestBody MoviesRequest request,
+    public ResponseEntity<?> updateRequest(@RequestBody Movies movies,
                                             @PathVariable Long movieId,
                                             @RequestHeader("Authorization") String jwt) {
         try {
@@ -67,7 +67,7 @@ public class MoviesController {
             if (user == null) {
                 return new ResponseEntity<>("User not authorized", HttpStatus.UNAUTHORIZED);
             }
-            Movies movie = movieService.updateRequest(request, movieId);
+            Movies movie = movieService.updateMovies(movies, movieId);
             if (movie == null) {
                 return new ResponseEntity<>("Movie not found", HttpStatus.NOT_FOUND);
             }
